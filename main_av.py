@@ -80,7 +80,11 @@ if __name__ == '__main__':
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, betas=(0.9, 0.999))
 
     # 动态调整学习率
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True)
+    # 方案1：Plateau策略（当前使用）- 当指标不再增长时降低学习率，适合精细微调
+    # scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True)
+    # 方案2：余弦退火热重启（CosineAnnealingWarmRestarts）- 周期性重置学习率，防止陷入局部最优
+    # T_0=10 表示每10个epoch重启一次，T_mult=2 表示每次重启周期加倍（10->20->40...）
+    scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=2, eta_min=1e-6)
 
     # 加载训练，测试和验证数据集
     train_loader = get_dataloader(split='train', batch_size=batch_size, seed=seed, sample_rate=sample_rate, num_workers=8)
