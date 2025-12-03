@@ -18,14 +18,12 @@ class S3DWrapper(nn.Module):
         video_input = video_input.view(batch_size, num_clips, 8, channels, height, width)
         video_features = []
         for clip_idx in range(num_clips):
-            clip_input = video_input[:, clip_idx, :, :, :, :]
+            clip_input = video_input[:, clip_idx, :, :, :, :]  # (batch_size, num_frames, channels, height, width)
             clip_output = self.s3d_model(clip_input)
             video_features.append(clip_output)
 
         # Combine the outputs from each clip
-        video_features = torch.stack(video_features, dim=1)
-        # video_features形状为：torch.Size([8, 1, 1024])
-        # 1024(Feature Dim):因为3D图像(8,3,224,224)经过S3D网络被压缩成了一个1024维的特征向量
+        video_features = torch.stack(video_features, dim=1)  # (batch_size, num_clips, channels, ...) 形状为：torch.Size([8, 1, 1024])
         return video_features
 
 
@@ -53,6 +51,19 @@ class AudioProcessor(nn.Module):
         return audio_features
 
 
+# [新增]单模态时序上下文增强模块
+# 使用 Transformer Encoder Layer 对片段序列进行自注意力建模，捕获模态内部的时间依赖性
+class TemporalContextModule(nn.Module):
+    def __init__(self, input_dim, num_heads=4, dropout=0.1, num_layers=1):
+        super(TemporalContextModule, self).__init__()
+        # batch_first=True 确保输入输出维度为 (batch, seq_len, feature)
+        encoder_layer = nn.TransformerEncoderLayer(d_model=input_dim, nhead=num_heads, batch_first=True, dropout=dropout)
+        self.transformer_encoder = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
+        
+    def forward(self, x):
+        return self.transformer_encoder(x)
+
+
 class Fish_Fusion(nn.Module):
     def __init__(self, audio_encoder, visual_encoder, output_dim=512, num_categories=4):
         super(Fish_Fusion, self).__init__()
@@ -62,6 +73,11 @@ class Fish_Fusion(nn.Module):
 
         self.audio_processor = AudioProcessor(audio_encoder)
         self.video_encoder = S3DWrapper(visual_encoder)
+
+        # [新增] 单模态特征的时序增强
+        # 音频特征维度 512, 视频特征维度 1024
+        self.audio_temporal_enhancer = TemporalContextModule(input_dim=512)
+        self.video_temporal_enhancer = TemporalContextModule(input_dim=1024)
 
         self.output_dim = output_dim
         self.num_categories = num_categories
@@ -75,6 +91,9 @@ class Fish_Fusion(nn.Module):
         # 处理视频
         # video_input形状为：torch.Size([8, 8, 3, 224, 224])
         visual_features = self.video_encoder(video_input) # 形状为：torch.Size([8, 1, 1024])
+        
+        # [新增] 视频特征时序增强
+        visual_features = self.video_temporal_enhancer(visual_features)
 
         # visual_features = self.visual_linear(video_features)
         # import ipdb; ipdb.set_trace()
@@ -85,6 +104,9 @@ class Fish_Fusion(nn.Module):
         # 处理音频
         # audio_input形状为：torch.Size([8, 128000])
         audio_features = self.audio_processor(audio_input, num_clips) # 形状为：torch.Size([8, 128000])
+        
+        # [新增] 音频特征时序增强
+        audio_features = self.audio_temporal_enhancer(audio_features)
 
         # 融合特征
         fused_features = self.fusion_model(audio_features, visual_features) # 形状为：torch.Size([8, 4])
@@ -114,19 +136,63 @@ class AttentionBRFF(nn.Module):
         self.cross_modal_attention = nn.MultiheadAttention(residual_dim, num_heads=8, batch_first=True)
 
     def forward(self, audio_input, visual_input):
-        # audio_input形状为：torch.Size([8, 1, 512])，visual_input形状为：torch.Size([8, 1, 1024])
         # 维度投影：用 ResidualProjection 把音频 (512) 与视频 (1024) 各自投到共同维度 (512)
-        residual_audio = self.audio_residual_projection(audio_input) # 形状为：torch.Size([8, 1, 512])
-        residual_visual = self.visual_residual_projection(visual_input) # 形状为：torch.Size([8, 1, 512])
+        residual_audio = self.audio_residual_projection(audio_input)
+        residual_visual = self.visual_residual_projection(visual_input)
 
         # 音频作为 query ，视频作为 key/value 计算注意力，得到 ffuse_a1
-        ffuse_a1, _ = self.cross_modal_attention(residual_audio, residual_visual, residual_visual) # 形状为：torch.Size([8, 1, 512])
+        ffuse_a1, _ = self.cross_modal_attention(residual_audio, residual_visual, residual_visual) # 1, 6, 512
         # 视频作为 query ，音频作为 key/value 计算注意力，得到 ffuse_v1
-        ffuse_v1, _ = self.cross_modal_attention(residual_visual, residual_audio, residual_audio) # 形状为：torch.Size([8, 1, 512])
+        ffuse_v1, _ = self.cross_modal_attention(residual_visual, residual_audio, residual_audio) # 1, 6, 512
 
         # 残差融合
-        ffuse_a = ffuse_a1 + residual_audio # 形状为：torch.Size([8, 1, 512])
-        ffuse_v =ffuse_v1 + residual_visual # 形状为：torch.Size([8, 1, 512])
+        ffuse_a = ffuse_a1 + residual_audio
+        ffuse_v =ffuse_v1 + residual_visual
+        return ffuse_a, ffuse_v
+
+# 做双向跨模态注意力对齐与残差融合，让音频片段与视频片段在语义与时间上相互条件化后再融合
+class AttentionBRFF_hxl(nn.Module):
+    def __init__(self, audio_encoder, visual_encoder, residual_dim=512):
+        super(AttentionBRFF_hxl, self).__init__()
+        self.audio_encoder = audio_encoder
+        self.visual_encoder = visual_encoder
+        self.residual_dim = residual_dim
+        self.audio_residual_projection = ResidualProjection(512, self.residual_dim)
+        self.visual_residual_projection = ResidualProjection(1024, self.residual_dim)
+        self.cross_modal_attention = nn.MultiheadAttention(residual_dim, num_heads=8, batch_first=True)
+
+        # 定义简单融合层
+        self.simple_fusion_proj = nn.Linear(residual_dim * 2, residual_dim)
+        
+        # 添加 Dropout 层，防止过拟合，增强模型泛化能力
+        self.fusion_dropout = nn.Dropout(p=0.1)
+        
+        self.cross_modal_attention = nn.MultiheadAttention(residual_dim, num_heads=8, batch_first=True)
+
+    def forward(self, audio_input, visual_input):
+        # 维度投影：用 ResidualProjection 把音频 (512) 与视频 (1024) 各自投到共同维度 (512)
+        residual_audio = self.audio_residual_projection(audio_input)
+        residual_visual = self.visual_residual_projection(visual_input)
+
+        # 1. 简略融合 (Simple Fusion)
+        # 将投影后的音频和视频特征拼接
+        combined_features = torch.cat([residual_audio, residual_visual], dim=-1)
+        # 通过线性层进行融合，得到 simple_fused_features
+        simple_fused_features = self.simple_fusion_proj(combined_features)
+        # 对简单融合后的特征应用 Dropout
+        simple_fused_features = self.fusion_dropout(simple_fused_features)
+
+        # 2. 音频与 simple_fused_features 融合 (Fused A)
+        # 音频作为 query ，simple_fused_features 作为 key/value
+        ffuse_a1, _ = self.cross_modal_attention(residual_audio, simple_fused_features, simple_fused_features)
+
+        # 3. 视频与 simple_fused_features 融合 (Fused V)
+        # 视频作为 query ，simple_fused_features 作为 key/value
+        ffuse_v1, _ = self.cross_modal_attention(residual_visual, simple_fused_features, simple_fused_features)
+
+        # 残差融合
+        ffuse_a = ffuse_a1 + residual_audio
+        ffuse_v = ffuse_v1 + residual_visual
         return ffuse_a, ffuse_v
 
 
@@ -135,15 +201,15 @@ class BalanceMLA(nn.Module):
         super(BalanceMLA, self).__init__()
         self.audio_encoder = audio_encoder
         self.visual_encoder = visual_encoder
-        self.attention_brff = AttentionBRFF(audio_encoder, visual_encoder)
+        self.attention_brff = AttentionBRFF_hxl(audio_encoder, visual_encoder)
         self.adaptive_decision_fusion = AdaptiveDecisionFusion()
         self.category_level_weighting = CategoryLevelWeighting()
         self.prediction_layer = nn.Linear(output_dim, num_categories)
 
     def forward(self, audio_input, visual_input):
         ffuse_a, ffuse_v = self.attention_brff(audio_input, visual_input) #1,6,512
-        avg_ffuse_a = torch.mean(ffuse_a, dim=1)
-        avg_ffuse_v = torch.mean(ffuse_v, dim=1)
+        avg_ffuse_a = torch.mean(ffuse_a, dim=1)  # (batch_size, features)
+        avg_ffuse_v = torch.mean(ffuse_v, dim=1)  # (batch_size, features)
         ffu_a = self.prediction_layer(avg_ffuse_a)
         ffu_v = self.prediction_layer(avg_ffuse_v)
         weight_vector, avg_ffuse_a, avg_ffuse_v = self.adaptive_decision_fusion(avg_ffuse_a, avg_ffuse_v)

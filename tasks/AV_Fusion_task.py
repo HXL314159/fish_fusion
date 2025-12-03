@@ -16,7 +16,7 @@ from tqdm import tqdm
 from sklearn import metrics
 from sklearn.metrics import ConfusionMatrixDisplay
 
-def trainer(model, optimizer, train_loader, val_loader, test_loader, max_epoch, device, ckpt_dir):
+def trainer(model, optimizer, train_loader, val_loader, test_loader, max_epoch, device, ckpt_dir, scheduler=None):
     logger = log_config.getLogger()
     logger.info("Starting new training run（开始新一轮epoch的训练）")
 
@@ -27,15 +27,17 @@ def trainer(model, optimizer, train_loader, val_loader, test_loader, max_epoch, 
     loss_func = get_loss_func('clip_ce')
     # Define the fieldnames for the CSV file
     fieldnames = ['Epoch', 'Train_Loss', 'Train_Accuracy', 'Train_Precision', 'Train_Recall', 'Train_F1',
-                  'Val_Accuracy', 'Val_Precision', 'Val_Recall', 'Val_F1']
+                  'Val_Accuracy', 'Val_Precision', 'Val_Recall', 'Val_F1', 'Learning_Rate']
     # 用于存储每一个epoch测试结果
     epoch_results = []
     # 控制训练总轮次；每一轮对训练集完整遍历一次
     for epoch in range(max_epoch):
+        # 获取当前学习率
+        current_lr = optimizer.param_groups[0]['lr']
         mean_loss = 0
         for data_dict in tqdm(train_loader):
-            data_dict['video_form'] = data_dict['video_form'].to(device) # torch.Size([8, 128000])
-            data_dict['waveform'] = data_dict['waveform'].to(device) # torch.Size([8, 8, 3, 224, 224])
+            data_dict['video_form'] = data_dict['video_form'].to(device)
+            data_dict['waveform'] = data_dict['waveform'].to(device)
             data_dict['target'] = data_dict['target'].to(device)
 
             # 切入训练模式
@@ -85,7 +87,7 @@ def trainer(model, optimizer, train_loader, val_loader, test_loader, max_epoch, 
             epoch_result = {
                 'Epoch': epoch + 1, 'Train_Loss': epoch_loss, 'Train_Accuracy': train_acc, 'Train_Precision': train_precision,
                 'Train_Recall': train_recall, 'Train_F1': train_f1, 'Val_Accuracy': val_acc, 'Val_Precision': val_precision,
-                'Val_Recall': val_recall, 'Val_F1': val_f1
+                'Val_Recall': val_recall, 'Val_F1': val_f1, 'Learning_Rate': current_lr
             }
             epoch_results.append(epoch_result)
             message = val_statistics['message']
@@ -103,10 +105,16 @@ def trainer(model, optimizer, train_loader, val_loader, test_loader, max_epoch, 
             # 恢复训练模式
             model.train()
 
+            if scheduler is not None:
+                if isinstance(scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+                    scheduler.step(val_acc)
+                else:
+                    scheduler.step()
+
         logger.info(f'val_best_acc: {best_acc}, best_epoch: {best_epoch}')
 
         # 记录并添加每一个epoch结果
-        my_fieldnames = ['current_epoch_num', 'current_train_acc', 'current_valid_acc', 'current_best_epoch', 'current_valid_best_acc']
+        my_fieldnames = ['current_epoch_num', 'current_train_acc', 'current_valid_acc', 'current_best_epoch', 'current_valid_best_acc', 'current_learning_rate']
         csv_file_name = 'results_hxl.csv'
         # 如果文件不存在，就先创建并写入表头
         if not os.path.exists(csv_file_name):
@@ -115,8 +123,8 @@ def trainer(model, optimizer, train_loader, val_loader, test_loader, max_epoch, 
                 writer.writeheader()
         with open(csv_file_name, 'a', newline='', encoding='utf-8') as file:
             writer = csv.DictWriter(file, fieldnames=my_fieldnames)
-            writer.writerow({'current_epoch_num': epoch, 'current_train_acc': train_acc, 'current_valid_acc': current_val_acc, 'current_best_epoch': best_epoch, 'current_valid_best_acc': best_acc})
-        logger.info(f'当前批次：{epoch}，训练集准确率：{train_acc}，验证集准确率：{current_val_acc}，最佳验证集准确率：{best_acc}，最佳验证集批次：{best_epoch}')
+            writer.writerow({'current_epoch_num': epoch, 'current_train_acc': train_acc, 'current_valid_acc': current_val_acc, 'current_best_epoch': best_epoch, 'current_valid_best_acc': best_acc, 'current_learning_rate': current_lr})
+        logger.info(f'当前批次：{epoch}，训练集准确率：{train_acc}，验证集准确率：{current_val_acc}，最佳验证集准确率：{best_acc}，最佳验证集批次：{best_epoch}，当前学习率：{current_lr}')
 
     csv_file = 'results.csv'
 

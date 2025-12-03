@@ -79,6 +79,9 @@ if __name__ == '__main__':
     # 优化器
     optimizer = optim.Adam(model.parameters(), lr=learning_rate, betas=(0.9, 0.999))
 
+    # 动态调整学习率
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True)
+
     # 加载训练，测试和验证数据集
     train_loader = get_dataloader(split='train', batch_size=batch_size, seed=seed, sample_rate=sample_rate, num_workers=8)
     test_loader = get_dataloader(split='test', batch_size=batch_size, seed=seed, sample_rate=sample_rate, num_workers=8)
@@ -91,4 +94,4 @@ if __name__ == '__main__':
     logger.info(f"Test dataloader: {len(test_loader)* batch_size} samples")
 
     # 启动训练
-    trainer(model, optimizer, train_loader, val_loader, test_loader, max_epoch, device, ckpt_dir)
+    trainer(model, optimizer, train_loader, val_loader, test_loader, max_epoch, device, ckpt_dir, scheduler=scheduler)
