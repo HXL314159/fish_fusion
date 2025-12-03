@@ -13,4 +13,4 @@
     8.在AV_Fusion_task.py的trainer中加入了
         # 打印当前验证集正确率和当前epoch
         logger.info(f"current val_acc: {val_acc}, current epoch: {epoch}")
-    9.在AV_Fusion_task.py增添记录每一个epoch结果逻辑。
+    9.在AV_Fusion_task.py增添记录每一个epoch结果逻辑
