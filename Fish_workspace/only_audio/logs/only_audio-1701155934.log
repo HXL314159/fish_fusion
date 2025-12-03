@@ -1,0 +1,552 @@
+ 2023-11-28 15:18:57,316 - INFO - {'Exp_name': 'only_audio', 'Training': {'Batch_size': 128, 'Max_epoch': 100, 'learning_rate': 0.001, 'seed': 25, 'classes_num': 4}, 'Workspace': 'Fish_workspace'}
+ 2023-11-28 15:18:57,316 - INFO - DataParallel(
+  (module): fish_fusion(
+    (cnn6): Cnn6(
+      (spec_augmenter): SpecAugmentation(
+        (time_dropper): DropStripes()
+        (freq_dropper): DropStripes()
+      )
+      (bn0): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (conv_block1): ConvBlock5x5(
+        (conv1): Conv2d(1, 64, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), bias=False)
+        (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (conv_block2): ConvBlock5x5(
+        (conv1): Conv2d(64, 128, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), bias=False)
+        (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (conv_block3): ConvBlock5x5(
+        (conv1): Conv2d(128, 256, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), bias=False)
+        (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (conv_block4): ConvBlock5x5(
+        (conv1): Conv2d(256, 512, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), bias=False)
+        (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (fc1): Linear(in_features=512, out_features=512, bias=True)
+    )
+    (MobilenetV2): MobileNetV2(
+      (features): Sequential(
+        (0): Sequential(
+          (0): Conv2d(3, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (1): AvgPool2d(kernel_size=2, stride=2, padding=0)
+          (2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (3): ReLU6(inplace=True)
+        )
+        (1): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=32, bias=False)
+            (1): AvgPool2d(kernel_size=1, stride=1, padding=0)
+            (2): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (3): ReLU6(inplace=True)
+            (4): Conv2d(32, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (5): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (2): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(16, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96, bias=False)
+            (4): AvgPool2d(kernel_size=2, stride=2, padding=0)
+            (5): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(96, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (3): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(24, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+            (4): AvgPool2d(kernel_size=1, stride=1, padding=0)
+            (5): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(144, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(24, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (4): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(24, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+            (4): AvgPool2d(kernel_size=2, stride=2, padding=0)
+            (5): BatchNorm2d(144, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(144, 32, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (5): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(32, 192, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=192, bias=False)
+            (4): AvgPool2d(kernel_size=1, stride=1, padding=0)
+            (5): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(192, 32, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (6): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(32, 192, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=192, bias=False)
+            (4): AvgPool2d(kernel_size=1, stride=1, padding=0)
+            (5): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(192, 32, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (7): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(32, 192, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(192, 192, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=192, bias=False)
+            (4): AvgPool2d(kernel_size=2, stride=2, padding=0)
+            (5): BatchNorm2d(192, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(192, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (8): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(64, 384, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(384, 384, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=384, bias=False)
+            (4): AvgPool2d(kernel_size=1, stride=1, padding=0)
+            (5): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(384, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (9): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(64, 384, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(384, 384, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=384, bias=False)
+            (4): AvgPool2d(kernel_size=1, stride=1, padding=0)
+            (5): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(384, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (10): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(64, 384, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(384, 384, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=384, bias=False)
+            (4): AvgPool2d(kernel_size=1, stride=1, padding=0)
+            (5): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(384, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (11): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(64, 384, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(384, 384, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=384, bias=False)
+            (4): AvgPool2d(kernel_size=2, stride=2, padding=0)
+            (5): BatchNorm2d(384, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(384, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (12): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(96, 576, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(576, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(576, 576, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=576, bias=False)
+            (4): AvgPool2d(kernel_size=1, stride=1, padding=0)
+            (5): BatchNorm2d(576, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(576, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (13): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(96, 576, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(576, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(576, 576, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=576, bias=False)
+            (4): AvgPool2d(kernel_size=1, stride=1, padding=0)
+            (5): BatchNorm2d(576, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(576, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(96, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (14): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(96, 576, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(576, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(576, 576, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=576, bias=False)
+            (4): AvgPool2d(kernel_size=1, stride=1, padding=0)
+            (5): BatchNorm2d(576, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(576, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(160, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (15): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(960, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(960, 960, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=960, bias=False)
+            (4): AvgPool2d(kernel_size=1, stride=1, padding=0)
+            (5): BatchNorm2d(960, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(960, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(160, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (16): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(960, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(960, 960, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=960, bias=False)
+            (4): AvgPool2d(kernel_size=1, stride=1, padding=0)
+            (5): BatchNorm2d(960, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(960, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(160, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (17): InvertedResidual(
+          (conv): Sequential(
+            (0): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (1): BatchNorm2d(960, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (2): ReLU6(inplace=True)
+            (3): Conv2d(960, 960, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=960, bias=False)
+            (4): AvgPool2d(kernel_size=1, stride=1, padding=0)
+            (5): BatchNorm2d(960, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+            (6): ReLU6(inplace=True)
+            (7): Conv2d(960, 320, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (8): BatchNorm2d(320, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (18): Sequential(
+          (0): Conv2d(320, 1280, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(1280, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): ReLU6(inplace=True)
+        )
+      )
+      (fc1): Linear(in_features=1280, out_features=512, bias=True)
+    )
+    (resnet18): ResNet(
+      (conv1): Conv2d(3, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+      (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (layer1): Sequential(
+        (0): BasicBlock(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+        (1): BasicBlock(
+          (conv1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (layer2): Sequential(
+        (0): BasicBlock(
+          (conv1): Conv2d(64, 128, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (downsample): Sequential(
+            (0): Conv2d(64, 128, kernel_size=(1, 1), stride=(2, 2), bias=False)
+            (1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (1): BasicBlock(
+          (conv1): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(128, 128, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(128, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (layer3): Sequential(
+        (0): BasicBlock(
+          (conv1): Conv2d(128, 256, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (downsample): Sequential(
+            (0): Conv2d(128, 256, kernel_size=(1, 1), stride=(2, 2), bias=False)
+            (1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (1): BasicBlock(
+          (conv1): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(256, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (layer4): Sequential(
+        (0): BasicBlock(
+          (conv1): Conv2d(256, 512, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (downsample): Sequential(
+            (0): Conv2d(256, 512, kernel_size=(1, 1), stride=(2, 2), bias=False)
+            (1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (1): BasicBlock(
+          (conv1): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn1): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (relu): ReLU(inplace=True)
+          (conv2): Conv2d(512, 512, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+          (bn2): BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
+      )
+      (avgpool): AdaptiveAvgPool2d(output_size=(1, 1))
+    )
+    (fc1): Linear(in_features=1536, out_features=512, bias=True)
+    (classifer): Linear(in_features=512, out_features=4, bias=True)
+  )
+)
+ 2023-11-28 15:18:57,320 - INFO - Training dataloader: 5248 samples
+ 2023-11-28 15:18:57,320 - INFO - Val dataloader: 896 samples
+ 2023-11-28 15:18:57,320 - INFO - Test dataloader: 896 samples
+ 2023-11-28 15:18:57,320 - INFO - Starting new training run
+ 2023-11-28 15:20:41,576 - INFO - Training loss 0.7114814621646229 at epoch 0
+ 2023-11-28 15:21:04,275 - INFO - val_best_acc: 0.42, best_epoch: 0
+ 2023-11-28 15:22:48,928 - INFO - Training loss 0.5220648144803396 at epoch 1
+ 2023-11-28 15:23:11,754 - INFO - val_best_acc: 0.8425, best_epoch: 1
+ 2023-11-28 15:24:56,174 - INFO - Training loss 0.4690804815873867 at epoch 2
+ 2023-11-28 15:25:18,878 - INFO - val_best_acc: 0.85, best_epoch: 2
+ 2023-11-28 15:27:04,348 - INFO - Training loss 0.4289121017223451 at epoch 3
+ 2023-11-28 15:27:26,242 - INFO - val_best_acc: 0.85, best_epoch: 2
+ 2023-11-28 15:29:10,572 - INFO - Training loss 0.43524705418726295 at epoch 4
+ 2023-11-28 15:29:32,702 - INFO - val_best_acc: 0.85, best_epoch: 2
+ 2023-11-28 15:31:17,916 - INFO - Training loss 0.40977329306486177 at epoch 5
+ 2023-11-28 15:31:39,986 - INFO - val_best_acc: 0.85, best_epoch: 2
+ 2023-11-28 15:33:24,415 - INFO - Training loss 0.4057228528871769 at epoch 6
+ 2023-11-28 15:33:46,835 - INFO - val_best_acc: 0.855, best_epoch: 6
+ 2023-11-28 15:35:30,043 - INFO - Training loss 0.4106016028218153 at epoch 7
+ 2023-11-28 15:35:52,655 - INFO - val_best_acc: 0.85875, best_epoch: 7
+ 2023-11-28 15:37:37,782 - INFO - Training loss 0.39645123554439077 at epoch 8
+ 2023-11-28 15:37:59,914 - INFO - val_best_acc: 0.85875, best_epoch: 7
+ 2023-11-28 15:39:44,536 - INFO - Training loss 0.3828842363706449 at epoch 9
+ 2023-11-28 15:40:06,572 - INFO - val_best_acc: 0.85875, best_epoch: 7
+ 2023-11-28 15:41:50,085 - INFO - Training loss 0.37428983173719266 at epoch 10
+ 2023-11-28 15:42:11,995 - INFO - val_best_acc: 0.85875, best_epoch: 7
+ 2023-11-28 15:43:55,784 - INFO - Training loss 0.35876932522145716 at epoch 11
+ 2023-11-28 15:44:18,686 - INFO - val_best_acc: 0.8925, best_epoch: 11
+ 2023-11-28 15:46:04,939 - INFO - Training loss 0.35334804108956963 at epoch 12
+ 2023-11-28 15:46:27,044 - INFO - val_best_acc: 0.8925, best_epoch: 11
+ 2023-11-28 15:48:12,421 - INFO - Training loss 0.34647435022563466 at epoch 13
+ 2023-11-28 15:48:34,529 - INFO - val_best_acc: 0.8925, best_epoch: 11
+ 2023-11-28 15:50:17,798 - INFO - Training loss 0.35008914150842807 at epoch 14
+ 2023-11-28 15:50:41,435 - INFO - val_best_acc: 0.92125, best_epoch: 14
+ 2023-11-28 15:52:25,987 - INFO - Training loss 0.3431102397238336 at epoch 15
+ 2023-11-28 15:52:48,536 - INFO - val_best_acc: 0.92125, best_epoch: 14
+ 2023-11-28 15:54:34,882 - INFO - Training loss 0.3415659411651332 at epoch 16
+ 2023-11-28 15:54:56,710 - INFO - val_best_acc: 0.92125, best_epoch: 14
+ 2023-11-28 15:56:41,836 - INFO - Training loss 0.3408011437916174 at epoch 17
+ 2023-11-28 15:57:03,990 - INFO - val_best_acc: 0.92125, best_epoch: 14
+ 2023-11-28 15:58:47,732 - INFO - Training loss 0.33949285345833474 at epoch 18
+ 2023-11-28 15:59:09,237 - INFO - val_best_acc: 0.92125, best_epoch: 14
+ 2023-11-28 16:00:53,500 - INFO - Training loss 0.32865425653573943 at epoch 19
+ 2023-11-28 16:01:15,630 - INFO - val_best_acc: 0.92125, best_epoch: 14
+ 2023-11-28 16:02:59,524 - INFO - Training loss 0.34212489026348764 at epoch 20
+ 2023-11-28 16:03:21,746 - INFO - val_best_acc: 0.92125, best_epoch: 14
+ 2023-11-28 16:05:06,089 - INFO - Training loss 0.3335994594707722 at epoch 21
+ 2023-11-28 16:05:28,712 - INFO - val_best_acc: 0.9275, best_epoch: 21
+ 2023-11-28 16:07:13,481 - INFO - Training loss 0.3311907474587603 at epoch 22
+ 2023-11-28 16:07:35,975 - INFO - val_best_acc: 0.9275, best_epoch: 21
+ 2023-11-28 16:09:20,284 - INFO - Training loss 0.3111673717091723 at epoch 23
+ 2023-11-28 16:09:42,725 - INFO - val_best_acc: 0.92875, best_epoch: 23
+ 2023-11-28 16:11:27,260 - INFO - Training loss 0.30325672030448914 at epoch 24
+ 2023-11-28 16:11:49,071 - INFO - val_best_acc: 0.92875, best_epoch: 23
+ 2023-11-28 16:13:33,131 - INFO - Training loss 0.30045911051878116 at epoch 25
+ 2023-11-28 16:13:55,466 - INFO - val_best_acc: 0.92875, best_epoch: 23
+ 2023-11-28 16:15:39,565 - INFO - Training loss 0.2950463662060296 at epoch 26
+ 2023-11-28 16:16:01,620 - INFO - val_best_acc: 0.92875, best_epoch: 23
+ 2023-11-28 16:17:46,133 - INFO - Training loss 0.2972801305898806 at epoch 27
+ 2023-11-28 16:18:08,233 - INFO - val_best_acc: 0.92875, best_epoch: 23
+ 2023-11-28 16:19:52,291 - INFO - Training loss 0.3009212569492619 at epoch 28
+ 2023-11-28 16:20:14,186 - INFO - val_best_acc: 0.92875, best_epoch: 23
+ 2023-11-28 16:21:59,962 - INFO - Training loss 0.2789089930493657 at epoch 29
+ 2023-11-28 16:22:22,617 - INFO - val_best_acc: 0.93625, best_epoch: 29
+ 2023-11-28 16:24:06,582 - INFO - Training loss 0.2885543831237933 at epoch 30
+ 2023-11-28 16:24:29,237 - INFO - val_best_acc: 0.9375, best_epoch: 30
+ 2023-11-28 16:26:14,444 - INFO - Training loss 0.2864457641432925 at epoch 31
+ 2023-11-28 16:26:36,608 - INFO - val_best_acc: 0.9375, best_epoch: 30
+ 2023-11-28 16:28:20,472 - INFO - Training loss 0.2717468218832481 at epoch 32
+ 2023-11-28 16:28:42,272 - INFO - val_best_acc: 0.9375, best_epoch: 30
+ 2023-11-28 16:30:25,867 - INFO - Training loss 0.28947900817161654 at epoch 33
+ 2023-11-28 16:30:47,904 - INFO - val_best_acc: 0.9375, best_epoch: 30
+ 2023-11-28 16:32:32,168 - INFO - Training loss 0.2781330067210081 at epoch 34
+ 2023-11-28 16:32:54,238 - INFO - val_best_acc: 0.9375, best_epoch: 30
+ 2023-11-28 16:34:38,356 - INFO - Training loss 0.2774138894022965 at epoch 35
+ 2023-11-28 16:35:00,568 - INFO - val_best_acc: 0.9375, best_epoch: 30
+ 2023-11-28 16:36:46,072 - INFO - Training loss 0.2679700800558416 at epoch 36
+ 2023-11-28 16:37:09,175 - INFO - val_best_acc: 0.9375, best_epoch: 30
+ 2023-11-28 16:38:52,826 - INFO - Training loss 0.284623830056772 at epoch 37
+ 2023-11-28 16:39:14,987 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 16:41:01,430 - INFO - Training loss 0.2860441375069502 at epoch 38
+ 2023-11-28 16:41:23,393 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 16:43:08,672 - INFO - Training loss 0.33641192535074743 at epoch 39
+ 2023-11-28 16:43:30,592 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 16:45:13,776 - INFO - Training loss 0.2907623190705369 at epoch 40
+ 2023-11-28 16:45:35,656 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 16:47:19,637 - INFO - Training loss 0.29232813381567235 at epoch 41
+ 2023-11-28 16:47:42,212 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 16:49:25,666 - INFO - Training loss 0.26868658676380064 at epoch 42
+ 2023-11-28 16:49:47,692 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 16:51:32,967 - INFO - Training loss 0.2680594041580107 at epoch 43
+ 2023-11-28 16:51:54,760 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 16:53:38,029 - INFO - Training loss 0.26907715165033574 at epoch 44
+ 2023-11-28 16:54:00,705 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 16:55:43,756 - INFO - Training loss 0.2544871492356789 at epoch 45
+ 2023-11-28 16:56:06,195 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 16:57:49,217 - INFO - Training loss 0.2498502989367741 at epoch 46
+ 2023-11-28 16:58:11,452 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 16:59:54,445 - INFO - Training loss 0.2576767337031481 at epoch 47
+ 2023-11-28 17:00:16,586 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 17:02:00,472 - INFO - Training loss 0.2540126095821218 at epoch 48
+ 2023-11-28 17:02:22,395 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 17:04:05,936 - INFO - Training loss 0.2549268654206904 at epoch 49
+ 2023-11-28 17:04:28,031 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 17:06:10,923 - INFO - Training loss 0.250856067712714 at epoch 50
+ 2023-11-28 17:06:32,762 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 17:08:16,582 - INFO - Training loss 0.25833311422568994 at epoch 51
+ 2023-11-28 17:08:38,415 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 17:10:22,752 - INFO - Training loss 0.2389954917314576 at epoch 52
+ 2023-11-28 17:10:44,741 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 17:12:29,466 - INFO - Training loss 0.2501155105305881 at epoch 53
+ 2023-11-28 17:12:51,694 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 17:14:36,300 - INFO - Training loss 0.23669910903384045 at epoch 54
+ 2023-11-28 17:14:57,869 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 17:16:41,900 - INFO - Training loss 0.24153025375633705 at epoch 55
+ 2023-11-28 17:17:03,706 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 17:18:49,274 - INFO - Training loss 0.26244606622835487 at epoch 56
+ 2023-11-28 17:19:11,341 - INFO - val_best_acc: 0.945, best_epoch: 37
+ 2023-11-28 17:20:56,531 - INFO - Training loss 0.23985406756401062 at epoch 57
+ 2023-11-28 17:21:19,197 - INFO - val_best_acc: 0.95125, best_epoch: 57
+ 2023-11-28 17:23:04,695 - INFO - Training loss 0.249483874294816 at epoch 58
+ 2023-11-28 17:23:26,904 - INFO - val_best_acc: 0.95125, best_epoch: 57
+ 2023-11-28 17:25:11,475 - INFO - Training loss 0.2450970585753278 at epoch 59
+ 2023-11-28 17:25:33,327 - INFO - val_best_acc: 0.95125, best_epoch: 57
+ 2023-11-28 17:27:17,647 - INFO - Training loss 0.23147460600224937 at epoch 60
+ 2023-11-28 17:27:39,422 - INFO - val_best_acc: 0.95125, best_epoch: 57
+ 2023-11-28 17:29:22,445 - INFO - Training loss 0.23979948788154415 at epoch 61
+ 2023-11-28 17:29:44,760 - INFO - val_best_acc: 0.95125, best_epoch: 57
+ 2023-11-28 17:31:29,626 - INFO - Training loss 0.2309303523563757 at epoch 62
+ 2023-11-28 17:31:51,730 - INFO - val_best_acc: 0.95125, best_epoch: 57
+ 2023-11-28 17:33:36,140 - INFO - Training loss 0.22326840969120584 at epoch 63
+ 2023-11-28 17:33:58,377 - INFO - val_best_acc: 0.95125, best_epoch: 57
+ 2023-11-28 17:35:41,862 - INFO - Training loss 0.2383187762120875 at epoch 64
+ 2023-11-28 17:36:03,689 - INFO - val_best_acc: 0.95125, best_epoch: 57
+ 2023-11-28 17:37:48,816 - INFO - Training loss 0.22811004083331038 at epoch 65
+ 2023-11-28 17:38:11,210 - INFO - val_best_acc: 0.95125, best_epoch: 57
+ 2023-11-28 17:39:55,795 - INFO - Training loss 0.2282252435277148 at epoch 66
+ 2023-11-28 17:40:17,485 - INFO - val_best_acc: 0.95125, best_epoch: 57
+ 2023-11-28 17:42:01,099 - INFO - Training loss 0.22372825461916807 at epoch 67
+ 2023-11-28 17:42:23,471 - INFO - val_best_acc: 0.95375, best_epoch: 67
+ 2023-11-28 17:44:08,514 - INFO - Training loss 0.21895608923784116 at epoch 68
+ 2023-11-28 17:44:30,701 - INFO - val_best_acc: 0.95375, best_epoch: 67
+ 2023-11-28 17:46:14,128 - INFO - Training loss 0.2260334824280041 at epoch 69
+ 2023-11-28 17:46:37,572 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 17:48:23,336 - INFO - Training loss 0.22216667162209022 at epoch 70
+ 2023-11-28 17:48:45,347 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 17:50:29,808 - INFO - Training loss 0.2237339008872102 at epoch 71
+ 2023-11-28 17:50:51,868 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 17:52:37,751 - INFO - Training loss 0.20923040916280047 at epoch 72
+ 2023-11-28 17:53:00,296 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 17:54:44,553 - INFO - Training loss 0.2111554229404868 at epoch 73
+ 2023-11-28 17:55:06,902 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 17:56:51,606 - INFO - Training loss 0.2260480937434406 at epoch 74
+ 2023-11-28 17:57:13,438 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 17:58:57,643 - INFO - Training loss 0.2168415515888028 at epoch 75
+ 2023-11-28 17:59:19,612 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:01:03,790 - INFO - Training loss 0.2115386789891778 at epoch 76
+ 2023-11-28 18:01:25,554 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:03:11,306 - INFO - Training loss 0.21510902810387494 at epoch 77
+ 2023-11-28 18:03:33,592 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:05:18,183 - INFO - Training loss 0.22552209111248575 at epoch 78
+ 2023-11-28 18:05:40,693 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:07:24,736 - INFO - Training loss 0.21593869386649714 at epoch 79
+ 2023-11-28 18:07:46,369 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:09:31,411 - INFO - Training loss 0.2174315456210113 at epoch 80
+ 2023-11-28 18:09:53,969 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:11:38,784 - INFO - Training loss 0.2110341794607116 at epoch 81
+ 2023-11-28 18:12:00,569 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:13:45,452 - INFO - Training loss 0.2037754360495544 at epoch 82
+ 2023-11-28 18:14:08,005 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:15:52,453 - INFO - Training loss 0.21942374837107775 at epoch 83
+ 2023-11-28 18:16:14,802 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:17:59,210 - INFO - Training loss 0.20367164619085265 at epoch 84
+ 2023-11-28 18:18:21,304 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:20:05,643 - INFO - Training loss 0.20662693570299848 at epoch 85
+ 2023-11-28 18:20:28,382 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:22:13,291 - INFO - Training loss 0.20084401638042637 at epoch 86
+ 2023-11-28 18:22:35,594 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:24:21,013 - INFO - Training loss 0.21629109796954366 at epoch 87
+ 2023-11-28 18:24:43,218 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:26:28,192 - INFO - Training loss 0.219927092514387 at epoch 88
+ 2023-11-28 18:26:50,813 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:28:34,620 - INFO - Training loss 0.23892323091262724 at epoch 89
+ 2023-11-28 18:28:56,516 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:30:42,336 - INFO - Training loss 0.21255025412978196 at epoch 90
+ 2023-11-28 18:31:04,649 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:32:49,369 - INFO - Training loss 0.1982822490901482 at epoch 91
+ 2023-11-28 18:33:11,616 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:34:59,046 - INFO - Training loss 0.1988636655051534 at epoch 92
+ 2023-11-28 18:35:21,021 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:37:05,302 - INFO - Training loss 0.21024054525102057 at epoch 93
+ 2023-11-28 18:37:27,409 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:39:12,057 - INFO - Training loss 0.20113161097212537 at epoch 94
+ 2023-11-28 18:39:34,125 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:41:18,125 - INFO - Training loss 0.19692436296765398 at epoch 95
+ 2023-11-28 18:41:40,057 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:43:24,848 - INFO - Training loss 0.19401556653220478 at epoch 96
+ 2023-11-28 18:43:46,963 - INFO - val_best_acc: 0.9575, best_epoch: 69
+ 2023-11-28 18:45:32,857 - INFO - Training loss 0.19276440561544606 at epoch 97
+ 2023-11-28 18:45:55,710 - INFO - val_best_acc: 0.96125, best_epoch: 97
+ 2023-11-28 18:47:40,536 - INFO - Training loss 0.19511305686177277 at epoch 98
+ 2023-11-28 18:48:02,799 - INFO - val_best_acc: 0.96125, best_epoch: 97
+ 2023-11-28 18:49:47,222 - INFO - Training loss 0.19535288450921454 at epoch 99
+ 2023-11-28 18:50:09,730 - INFO - val_best_acc: 0.96125, best_epoch: 97
+ 2023-11-28 18:50:09,730 - INFO - Evaluate on the Test dataset_fish

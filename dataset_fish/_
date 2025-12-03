@@ -1,0 +1,146 @@
+import os
+import random
+import torch
+import numpy as np
+from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms
+from PIL import Image
+import config
+from dataset_fish.utils_tools import LogMelExtractor
+import librosa
+import time
+
+
+def data_generator(seed=20, test_sample_per_class=10):
+    random.seed(seed)
+    train_data = []
+    test_data = []
+    val_data = []
+
+    classes = ['none', 'weak', 'strong', 'medium']
+    label_map = {'none': 0, 'weak': 1, 'strong': 2, 'medium': 3}
+    root_dir = 'F:/test code/c/wwwroot/duzhuangzhuang/fish_fusion/dataset/mel'
+    si_root_dir = 'F:/test code/code5_multimodal fusion/fish_fusion/dataset/SI'
+    rgb_root_dir = 'F:/test code/code5_multimodal fusion/fish_fusion/dataset/RGB'
+    for class_name in classes:
+        class_dir = os.path.join(root_dir, class_name)
+        class_paths = [os.path.join(class_dir, filename) for filename in os.listdir(class_dir) if filename.endswith('.wav')]
+        random.shuffle(class_paths)
+
+        test_split = test_sample_per_class
+        val_split = 2 * test_sample_per_class
+
+        train_samples = class_paths[val_split:]
+        test_samples = class_paths[:test_split]
+        val_samples = class_paths[test_split:]
+
+        label = label_map[class_name]
+
+        for path in train_samples:
+            rgb_path = os.path.join(rgb_root_dir, class_name, 'RGB_{}.jpg'.format(os.path.splitext(os.path.basename(path))[0].split('_')[1]))
+            si_path = os.path.join(si_root_dir, class_name, 'SI_{}.jpg'.format(os.path.splitext(os.path.basename(path))[0].split('_')[1]))
+            train_data.append([path, si_path, rgb_path, label])
+
+        for path in test_samples:
+            rgb_path = os.path.join(rgb_root_dir, class_name, 'RGB_{}.jpg'.format(os.path.splitext(os.path.basename(path))[0].split('_')[1]))
+            si_path = os.path.join(si_root_dir, class_name, 'SI_{}.jpg'.format(os.path.splitext(os.path.basename(path))[0].split('_')[1]))
+            test_data.append([path, si_path, rgb_path, label])
+
+        for path in val_samples:
+            rgb_path = os.path.join(rgb_root_dir, class_name, 'RGB_{}.jpg'.format(os.path.splitext(os.path.basename(path))[0].split('_')[1]))
+            si_path = os.path.join(si_root_dir, class_name, 'SI_{}.jpg'.format(os.path.splitext(os.path.basename(path))[0].split('_')[1]))
+            val_data.append([path, si_path, rgb_path, label])
+
+    return train_data, test_data, val_data
+
+
+class fish_Dataset(Dataset):
+    def __init__(self, seed, split, test_sample_per_class=8):
+        self.sample_rate = config.sample_rate
+        self.window_size = config.window_size
+        self.hop_size = config.hop_size
+        self.mel_bins = config.mel_bins
+        self.fmin = config.fmin
+        self.fmax = config.fmax
+        # Feature extractor
+        self.feature_extractor = LogMelExtractor(
+            sample_rate=self.sample_rate,
+            window_size=self.window_size,
+            hop_size=self.hop_size,
+            mel_bins=self.mel_bins,
+            fmin=self.fmin,
+            fmax=self.fmax)
+        # image augment
+        self.transform = transforms.Compose([
+             transforms.RandomResizedCrop(size=256, scale=(0.8, 1.0)),  # 随机裁剪到256*256
+             transforms.RandomRotation(degrees=15),  # 随机旋转
+             transforms.RandomHorizontalFlip(),  # 随机水平翻转
+             transforms.CenterCrop(size=224),  # 中心裁剪到224*224
+             # 转化成张量,#归一化[0,1]（是将数据除以255），
+             # transforms.ToTensor（）会把HWC会变成C *H *W（拓展：格式为(h,w,c)，像素顺序为RGB）
+             transforms.ToTensor(),
+             transforms.Normalize([0.485, 0.456, 0.406],
+                                  [0.229, 0.224, 0.225])  # 标准化
+             ])
+
+        self.split = split
+        train_dict, test_dict, val_dict = data_generator(seed, test_sample_per_class)
+        if self.split == 'train':
+            self.data_dict = train_dict
+        elif self.split == 'test':
+            self.data_dict = test_dict
+        elif self.split == 'val':
+            self.data_dict = val_dict
+
+    def __len__(self):
+        return len(self.data_dict)
+
+    def __getitem__(self, index):
+        mel_path, si_path, rgb_path, target = self.data_dict[index]
+        audio, sample_rate = librosa.load(mel_path, sr=self.sample_rate)
+        feature = self.feature_extractor.transform(audio)
+        si_image = Image.open(si_path)
+        # si_image.show()
+        rgb_image = Image.open(rgb_path)
+        si_data = self.transform(si_image)
+        rgb_data = self.transform(rgb_image)
+
+        target = np.eye(4)[target]
+
+        data_dict = {'mel_data': feature, 'si_data': si_data, 'rgb_data': rgb_data, 'target': target}
+
+        return data_dict
+
+
+def collate_fn(batch):
+    feature = [data['mel_data'] for data in batch]
+    si_data = torch.stack([data['si_data'] for data in batch])
+    rgb_data = torch.stack([data['rgb_data'] for data in batch])
+    target = [data['target'] for data in batch]
+    feature = torch.FloatTensor(feature)
+    target = torch.FloatTensor(target)
+
+    return {'mel_data': feature, 'si_data': si_data, 'rgb_data': rgb_data, 'target': target}
+
+
+def get_dataloader(split,
+                   batch_size,
+                   seed,
+                   shuffle=False,
+                   drop_last=False,
+                   num_workers=8):
+
+    dataset = fish_Dataset(split=split, seed=seed)
+
+    return DataLoader(dataset=dataset, batch_size=batch_size,
+                      shuffle=shuffle, drop_last=drop_last,
+                      num_workers=num_workers, collate_fn=collate_fn)
+
+
+if __name__ == '__main__':
+    from tqdm import tqdm
+    # train_loader = get_dataloader(split='train', batch_size=10, seed=10, num_workers=8)
+    train_loader = fish_Dataset(split='train', seed=1)
+    for item in tqdm(train_loader):
+        # print(item['mel_path'])
+        pass

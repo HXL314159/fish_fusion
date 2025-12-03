@@ -1,0 +1,16 @@
+需要修改的地方：
+    1.AV_dataset.py文件中的get_video_name
+    2.修改了AV_dataset中Fish_Dataset的test_sample_per_class参数
+    3.utils中的get_audioname.py修改了get_audio_file中的audio_files路径
+    4.修改了pytorch_utils中的forward_av
+    5.修改了main_av.py中的num_workers
+    6.main_av增加了：
+        # Set multiprocessing sharing strategy to file_system to avoid shared memory issues
+        torch.multiprocessing.set_sharing_strategy('file_system')
+    7.注释了pytorch_utils.py里的：
+        append_to_dict(output_dict, 'batch_video', batch_data_dict['video_form'])
+        append_to_dict(output_dict, 'batch_audio', batch_data_dict['waveform'])
+    8.在AV_Fusion_task.py的trainer中加入了
+        # 打印当前验证集正确率和当前epoch
+        logger.info(f"current val_acc: {val_acc}, current epoch: {epoch}")
+    9.在AV_Fusion_task.py增添记录每一个epoch结果逻辑

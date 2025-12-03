@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="root@36.103.203.216:30085 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/root/shared-nvme/CODE/fish_fush" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="root@36.103.203.216:30091 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/root/shared-nvme/CODE/fish_fush" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="root@36.103.203.216:30119 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/root/shared-nvme/CODE/fish_fush" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="root@36.103.203.216:30243 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/root/shared-nvme/CODE" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="root@36.103.203.216:30314 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_81" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="root@36.103.203.216:30314 password (2)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_112" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="root@36.103.203.216:30352 password">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="root@36.103.203.216:30352 password (2)">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>
